@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance AI — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0b0f1a; --surface: #111827; --surface2: #1a2236;
+  --border: #1f2f4a; --accent: #3b82f6; --accent2: #10b981;
+  --text: #e2e8f0; --muted: #64748b; --danger: #ef4444;
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; display: flex;
+  align-items: center; justify-content: center;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 40px 40px; pointer-events: none;
+}
+.container { width: 100%; max-width: 420px; padding: 24px; position: relative; z-index: 1; }
+.logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 32px; }
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 12px; display: grid; place-items: center; font-size: 20px;
+}
+.logo-text { font-family: 'DM Serif Display', serif; font-size: 24px; letter-spacing: -0.3px; }
+.logo-text span { color: var(--accent); }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px; animation: fadeUp 0.4s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tabs {
+  display: flex; background: var(--surface2);
+  border-radius: 12px; padding: 4px; margin-bottom: 28px;
+}
+.tab {
+  flex: 1; padding: 10px; text-align: center; font-size: 14px;
+  font-weight: 600; border-radius: 9px; cursor: pointer;
+  transition: all 0.2s; color: var(--muted);
+}
+.tab.active {
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.form-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; }
+.form-title em { color: var(--accent); font-style: italic; }
+.form-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+}
+.field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--accent); }
+.field input::placeholder { color: var(--muted); }
+.btn {
+  width: 100%; padding: 13px; background: var(--accent); color: #fff;
+  border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn:hover { background: #2563eb; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.alert {
+  padding: 12px 14px; border-radius: 10px; font-size: 13px;
+  margin-bottom: 16px; display: none;
+}
+.alert.error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+.alert.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+.divider {
+  text-align: center; font-size: 12px; color: var(--muted);
+  margin: 20px 0; position: relative;
+}
+.divider::before, .divider::after {
+  content: ''; position: absolute; top: 50%;
+  width: calc(50% - 28px); height: 1px; background: var(--border);
+}
+.divider::before { left: 0; } .divider::after { right: 0; }
+.footer-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 20px; }
+.footer-note strong { color: var(--accent2); }
+.spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin 0.6s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon">💹</div>
+    <div class="logo-text">Finance<span>AI</span></div>
+  </div>
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+      <div class="tab" id="tab-register" onclick="switchTab('register')">Create Account</div>
+    </div>
+    <div class="alert" id="alert"></div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <div class="form-title">Welcome <em>back</em></div>
+      <div class="form-sub">Sign in to your Finance AI account</div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" id="login-btn" onclick="doLogin()">
+        <span>Sign In</span>
+        <div class="spinner" id="login-spinner"></div>
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="form-register" style="display:none">
+      <div class="form-title">Join <em>Finance AI</em></div>
+      <div class="form-sub">Create your free account today</div>
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="reg-username" placeholder="e.g. john_doe" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="At least 6 characters" autocomplete="new-password">
+      </div>
+      <button class="btn" id="reg-btn" onclick="doRegister()">
+        <span>Create Account</span>
+        <div class="spinner" id="reg-spinner"></div>
+      </button>
+    </div>
+
+    <div class="divider">Finance AI Advisor</div>
+    <div class="footer-note">
+      <strong>Free tier active</strong> · Powered by Gemini 2.0 Flash via OpenRouter
+    </div>
+  </div>
+</div>
+<script>
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login')
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register')
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none'
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none'
+  hideAlert()
+}
+function showAlert(msg, type = 'error') {
+  const a = document.getElementById('alert')
+  a.textContent = msg; a.className = `alert ${type}`; a.style.display = 'block'
+}
+function hideAlert() { document.getElementById('alert').style.display = 'none' }
+function setLoading(btnId, spinnerId, loading) {
+  document.getElementById(btnId).disabled = loading
+  document.getElementById(spinnerId).style.display = loading ? 'block' : 'none'
+}
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim()
+  const password = document.getElementById('login-password').value
+  if (!email || !password) return showAlert('Please fill in all fields')
+  setLoading('login-btn', 'login-spinner', true); hideAlert()
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    const data = await res.json()
+    if (data.success) {
+      showAlert(`Welcome back, ${data.username}! Redirecting…`, 'success')
+      setTimeout(() => window.location.href = '/', 800)
+    } else { showAlert(data.error || 'Login failed') }
+  } catch { showAlert('Connection error. Is the server running?') }
+  setLoading('login-btn', 'login-spinner', false)
+}
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim()
+  const email = document.getElementById('reg-email').value.trim()
+  const password = document.getElementById('reg-password').value
+  if (!username || !email || !password) return showAlert('Please fill in all fields')
+  setLoading('reg-btn', 'reg-spinner', true); hideAlert()
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+    })
+    const data = await res.json()
+    if (data.success) {
+      showAlert('Account created! Signing you in…', 'success')
+      const lr = await fetch('/api/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      if ((await lr.json()).success) setTimeout(() => window.location.href = '/', 800)
+    } else { showAlert(data.error || 'Registration failed') }
+  } catch { showAlert('Connection error. Is the server running?') }
+  setLoading('reg-btn', 'reg-spinner', false)
+}
+document.addEventListener('keypress', e => {
+  if (e.key !== 'Enter') return
+  document.getElementById('form-login').style.display !== 'none' ? doLogin() : doRegister()
+})
+</script>
+</body>
+</html>

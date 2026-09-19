@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance AI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0b0f1a; --surface: #111827; --surface2: #1a2236;
+  --border: #1f2f4a; --accent: #3b82f6; --accent2: #10b981;
+  --gold: #f59e0b; --text: #e2e8f0; --muted: #64748b;
+  --danger: #ef4444; --sidebar-w: 260px;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 16px; flex-shrink: 0; }
+.logo { display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 36px; cursor: pointer; }
+.logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.logo-text { font-family: 'DM Serif Display', serif; font-size: 20px; letter-spacing: -0.3px; }
+.logo-text span { color: var(--accent); }
+.nav-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 0 12px; margin-bottom: 8px; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 12px; border-radius: 10px; cursor: pointer; transition: all 0.18s; margin-bottom: 4px; font-size: 14px; font-weight: 500; color: var(--muted); border: 1px solid transparent; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--surface2); color: var(--text); border-color: var(--border); }
+.nav-icon { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-size: 15px; flex-shrink: 0; }
+.nav-item[data-mode="general"]    .nav-icon { background: #1e293b; }
+.nav-item[data-mode="investment"] .nav-icon { background: #0f2d1e; }
+.nav-item[data-mode="stocks"]     .nav-icon { background: #0c1f3d; }
+.nav-item[data-mode="savings"]    .nav-icon { background: #2d1a0a; }
+.sidebar-footer { margin-top: auto; padding: 12px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--muted); line-height: 1.5; }
+.sidebar-footer strong { color: var(--accent2); font-weight: 600; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; background: var(--surface); }
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.topbar-sep { color: var(--border); margin: 0 4px; }
+.model-tag { margin-left: auto; font-size: 11px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+.model-dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+/* User chip + logout */
+.user-chip { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--text); margin-left: 10px; }
+.user-chip .avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.logout-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.18s; margin-left: 6px; }
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+/* Messages */
+.messages { flex: 1; overflow-y: auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-track { background: transparent; }
+.messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; gap: 16px; animation: fadeUp 0.5s ease; }
+.welcome-icon { font-size: 52px; line-height: 1; }
+.welcome h1 { font-family: 'DM Serif Display', serif; font-size: 32px; letter-spacing: -0.5px; }
+.welcome h1 em { color: var(--accent); font-style: italic; }
+.welcome p { color: var(--muted); font-size: 15px; max-width: 420px; line-height: 1.6; }
+.welcome-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; width: 100%; max-width: 480px; }
+.welcome-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.18s; text-align: left; }
+.welcome-card:hover { border-color: var(--accent); background: var(--surface2); transform: translateY(-2px); }
+.welcome-card .wc-icon { font-size: 20px; margin-bottom: 6px; }
+.welcome-card .wc-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.welcome-card .wc-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.msg-row { display: flex; gap: 12px; animation: fadeUp 0.3s ease; }
+.msg-row.user { flex-direction: row-reverse; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+.msg-row.bot .msg-avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+.msg-row.user .msg-avatar { background: var(--surface2); border: 1px solid var(--border); }
+.msg-bubble { max-width: 680px; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+.msg-row.bot .msg-bubble { background: var(--surface); border: 1px solid var(--border); border-top-left-radius: 4px; }
+.msg-row.user .msg-bubble { background: var(--accent); color: #fff; border-top-right-radius: 4px; }
+.typing { display: flex; align-items: center; gap: 5px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; border-top-left-radius: 4px; width: fit-content; }
+.typing span { width: 7px; height: 7px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.input-area { padding: 16px 24px 20px; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; }
+.input-wrap { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 6px 6px 6px 16px; transition: border-color 0.2s; }
+.input-wrap:focus-within { border-color: var(--accent); }
+.input-wrap input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 8px 0; }
+.input-wrap input::placeholder { color: var(--muted); }
+.send-btn { width: 38px; height: 38px; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; display: grid; place-items: center; transition: all 0.18s; flex-shrink: 0; color: white; font-size: 16px; }
+.send-btn:hover { background: #2563eb; transform: scale(1.05); }
+.send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+.input-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo" onclick="goHome()">
+    <div class="logo-icon">💹</div>
+    <div class="logo-text">Finance<span>AI</span></div>
+  </div>
+  <div class="nav-label">Advisors</div>
+  <div class="nav-item active" data-mode="general" onclick="setMode(this)">
+    <div class="nav-icon">🏠</div><div>Home</div>
+  </div>
+  <div class="nav-item" data-mode="investment" onclick="setMode(this)">
+    <div class="nav-icon">📈</div><div>Investment Advisor</div>
+  </div>
+  <div class="nav-item" data-mode="stocks" onclick="setMode(this)">
+    <div class="nav-icon">📊</div><div>Stock Market</div>
+  </div>
+  <div class="nav-item" data-mode="savings" onclick="setMode(this)">
+    <div class="nav-icon">💰</div><div>Savings Coach</div>
+  </div>
+  <div class="sidebar-footer">
+    <strong>Free tier active</strong><br>
+    Powered by Gemini 2.0 Flash via OpenRouter. 200 req/day limit.
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <span id="topbar-icon">🏠</span>
+    <span class="topbar-sep">|</span>
+    <span class="topbar-title" id="topbar-title">Home — General Finance</span>
+    <div class="model-tag">
+      <div class="model-dot"></div>
+      gemini-2.0-flash:free
+    </div>
+    <div class="user-chip">
+      <div class="avatar" id="user-avatar">?</div>
+      <span id="username-display">{{ user.username }}</span>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Sign out</button>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-area">
+    <div class="input-wrap">
+      <input id="msgInput" placeholder="Ask anything about finance, stocks, savings…" autocomplete="off">
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+    <div class="input-hint">Press Enter to send &nbsp;·&nbsp; Switch modes from the sidebar</div>
+  </div>
+</div>
+
+<script>
+const MODES = {
+  general:    { icon: "🏠", label: "Home — General Finance",      greeting: "👋 Welcome to <b>Finance AI</b>!\n\nI'm your personal finance advisor. Ask me anything about money, budgeting, investing, or economics." },
+  investment: { icon: "📈", label: "Investment Advisor",           greeting: "📈 <b>Investment Advisor</b> ready!\n\nTell me how much you'd like to invest, your time horizon, and risk appetite — or just ask a general investment question." },
+  stocks:     { icon: "📊", label: "Stock Market Advisor",         greeting: "📊 <b>Stock Market Assistant</b> here!\n\nAsk about any stock — Apple, Tesla, Nvidia, Amazon — or ask about market trends and strategies." },
+  savings:    { icon: "💰", label: "Savings Coach",                greeting: "💰 <b>Savings Coach</b> activated!\n\nShare your monthly income or saving goal and I'll help you build a realistic savings plan." },
+}
+
+let currentMode = "general"
+let isLoading = false
+
+const username = document.getElementById('username-display').textContent.trim()
+document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase()
+
+async function doLogout() {
+  await fetch('/api/logout', { method: 'POST' })
+  window.location.href = '/login'
+}
+
+function goHome() {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"))
+  document.querySelector('[data-mode="general"]').classList.add("active")
+  currentMode = "general"
+  updateTopbar("general")
+  showWelcome()
+}
+
+function setMode(el) {
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"))
+  el.classList.add("active")
+  currentMode = el.dataset.mode
+  updateTopbar(currentMode)
+  clearMessages()
+  addBot(MODES[currentMode].greeting)
+}
+
+function updateTopbar(mode) {
+  document.getElementById("topbar-icon").textContent = MODES[mode].icon
+  document.getElementById("topbar-title").textContent = MODES[mode].label
+}
+
+function showWelcome() {
+  const m = document.getElementById("messages")
+  m.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-icon">💹</div>
+      <h1>Your <em>AI</em> Finance Advisor</h1>
+      <p>Select a mode from the sidebar, or ask any finance question below to get started.</p>
+      <div class="welcome-cards">
+        <div class="welcome-card" onclick="quickStart('investment')">
+          <div class="wc-icon">📈</div>
+          <div class="wc-title">Investment Advisor</div>
+          <div class="wc-sub">Personalized investment plans</div>
+        </div>
+        <div class="welcome-card" onclick="quickStart('stocks')">
+          <div class="wc-icon">📊</div>
+          <div class="wc-title">Stock Market</div>
+          <div class="wc-sub">Stocks, trends & analysis</div>
+        </div>
+        <div class="welcome-card" onclick="quickStart('savings')">
+          <div class="wc-icon">💰</div>
+          <div class="wc-title">Savings Coach</div>
+          <div class="wc-sub">Budget & save smarter</div>
+        </div>
+        <div class="welcome-card" onclick="document.getElementById('msgInput').focus()">
+          <div class="wc-icon">💬</div>
+          <div class="wc-title">Ask Anything</div>
+          <div class="wc-sub">General finance questions</div>
+        </div>
+      </div>
+    </div>`
+}
+
+function quickStart(mode) { setMode(document.querySelector(`[data-mode="${mode}"]`)) }
+function clearMessages() { document.getElementById("messages").innerHTML = "" }
+
+function addBot(html) {
+  const m = document.getElementById("messages")
+  const row = document.createElement("div")
+  row.className = "msg-row bot"
+  row.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble">${html}</div>`
+  m.appendChild(row); m.scrollTop = m.scrollHeight
+}
+
+function addUser(text) {
+  const m = document.getElementById("messages")
+  const row = document.createElement("div")
+  row.className = "msg-row user"
+  row.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-bubble">${escHtml(text)}</div>`
+  m.appendChild(row); m.scrollTop = m.scrollHeight
+}
+
+function showTyping() {
+  const m = document.getElementById("messages")
+  const row = document.createElement("div")
+  row.className = "msg-row bot"; row.id = "typing-row"
+  row.innerHTML = `<div class="msg-avatar">🤖</div><div class="typing"><span></span><span></span><span></span></div>`
+  m.appendChild(row); m.scrollTop = m.scrollHeight
+}
+
+function removeTyping() { const t = document.getElementById("typing-row"); if (t) t.remove() }
+function escHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") }
+
+function formatReply(text) {
+  return text
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    .replace(/\n/g, "<br>")
+}
+
+async function sendMessage() {
+  const input = document.getElementById("msgInput")
+  const text = input.value.trim()
+  if (!text || isLoading) return
+  if (document.querySelector(".welcome")) clearMessages()
+  addUser(text); input.value = ""
+  isLoading = true; document.getElementById("sendBtn").disabled = true
+  showTyping()
+  try {
+    const res = await fetch("/chat", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, mode: currentMode })
+    })
+    if (res.status === 401) { window.location.href = '/login'; return }
+    const data = await res.json()
+    removeTyping(); addBot(formatReply(data.reply))
+  } catch (e) {
+    removeTyping()
+    addBot("⚠️ <b>Connection error.</b> Make sure the server is running and try again.")
+  }
+  isLoading = false; document.getElementById("sendBtn").disabled = false; input.focus()
+}
+
+document.getElementById("msgInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage()
+})
+
+goHome()
+</script>
+</body>
+</html>
